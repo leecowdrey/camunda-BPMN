@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0wskfyo" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.3.2">
+  <bpmn:process id="Process_TotalCapacity" name="FindTotalCapacityAtoB" isExecutable="true" camunda:versionTag="0.1">
+    <bpmn:startEvent id="StartEvent_TotalCapacityAtoB" name="Find-Total-Capacity-AtoB">
+      <bpmn:outgoing>SequenceFlow_0icy8yp</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0icy8yp" sourceRef="StartEvent_TotalCapacityAtoB" targetRef="Task_GetPhotoniceServices" />
+    <bpmn:scriptTask id="Task_GetPhotoniceServices" name="Get-List-Of-Photonice-Services" scriptFormat="python" camunda:resultVariable="ListOfPhotoniceServicesAtoB" camunda:resource="deployment:///tmp/workflows/GetPhotoniceServices.py">
+      <bpmn:incoming>SequenceFlow_0icy8yp</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_PhotonicList</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:scriptTask id="Task_FindTransportClient" name="Find-Transport-Clients" scriptFormat="python" camunda:resource="deployment:///tmp/workflows/GetTransportClients.py">
+      <bpmn:incoming>SequenceFlow_PhotonicList</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_ForEachPhotonic</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_ForEachPhotonic</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_TransportClients</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="SequenceFlow_PhotonicList" name="Photonic-List" sourceRef="Task_GetPhotoniceServices" targetRef="Task_FindTransportClient" />
+    <bpmn:sequenceFlow id="SequenceFlow_ForEachPhotonic" name="For-Each-Photonic" sourceRef="Task_FindTransportClient" targetRef="Task_FindTransportClient" />
+    <bpmn:sequenceFlow id="SequenceFlow_TransportClients" name="Photonic-List-With-Transport-Clients" sourceRef="Task_FindTransportClient" targetRef="Task_AvailableCapacity" />
+    <bpmn:scriptTask id="Task_AvailableCapacity" name="AvailableCapacity" scriptFormat="python" camunda:resultVariable="ListOfAvailableCapacityInPhotonic" camunda:resource="deployment:///tmp/workflows/FindAvailableCapacity.py">
+      <bpmn:incoming>SequenceFlow_TransportClients</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1tdnrdh</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="SequenceFlow_1tdnrdh" sourceRef="Task_AvailableCapacity" targetRef="Task_GetRoutePhotonic" />
+    <bpmn:scriptTask id="Task_GetRoutePhotonic" name="Get-All-Route-Between-AandB" scriptFormat="python" camunda:resultVariable="PossiblePhotoniceWithMaxCapacity" camunda:resource="deployment:///tmp/workflows/FindRouteWithMaxCapacity.py">
+      <bpmn:incoming>SequenceFlow_1tdnrdh</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0f3e7g2</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:endEvent id="EndEvent_TotalCapacity" name="TotalCapacityList">
+      <bpmn:incoming>SequenceFlow_0f3e7g2</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0f3e7g2" sourceRef="Task_GetRoutePhotonic" targetRef="EndEvent_TotalCapacity" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_TotalCapacity">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_TotalCapacityAtoB">
+        <dc:Bounds x="179" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="163" y="142" width="71" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0icy8yp_di" bpmnElement="SequenceFlow_0icy8yp">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="270" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ScriptTask_18ly8nq_di" bpmnElement="Task_GetPhotoniceServices">
+        <dc:Bounds x="270" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ScriptTask_1jds1r8_di" bpmnElement="Task_FindTransportClient">
+        <dc:Bounds x="470" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0kftzbq_di" bpmnElement="SequenceFlow_PhotonicList">
+        <di:waypoint x="370" y="117" />
+        <di:waypoint x="470" y="117" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="391" y="99" width="64" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0ejq50t_di" bpmnElement="SequenceFlow_ForEachPhotonic">
+        <di:waypoint x="520" y="157" />
+        <di:waypoint x="520" y="210" />
+        <di:waypoint x="450" y="210" />
+        <di:waypoint x="450" y="140" />
+        <di:waypoint x="470" y="140" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="397" y="165" width="50" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_10ihqqn_di" bpmnElement="SequenceFlow_TransportClients">
+        <di:waypoint x="570" y="117" />
+        <di:waypoint x="700" y="117" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="600" y="91" width="76" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ScriptTask_08oahp9_di" bpmnElement="Task_AvailableCapacity">
+        <dc:Bounds x="700" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1tdnrdh_di" bpmnElement="SequenceFlow_1tdnrdh">
+        <di:waypoint x="800" y="117" />
+        <di:waypoint x="870" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ScriptTask_1phz5c4_di" bpmnElement="Task_GetRoutePhotonic">
+        <dc:Bounds x="870" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0nii4ek_di" bpmnElement="EndEvent_TotalCapacity">
+        <dc:Bounds x="1042" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1020" y="142" width="84" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0f3e7g2_di" bpmnElement="SequenceFlow_0f3e7g2">
+        <di:waypoint x="970" y="117" />
+        <di:waypoint x="1042" y="117" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

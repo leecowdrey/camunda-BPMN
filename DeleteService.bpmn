@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1ph0f82" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.3.2">
+  <bpmn:process id="DeleteService" name="DeleteService" isExecutable="true" camunda:versionTag="0.1">
+    <bpmn:startEvent id="StartEvent_DeleteServic" name="DeleteService">
+      <bpmn:outgoing>SequenceFlow_0skk5gs</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:scriptTask id="ScriptTask_DeleteService" name="Delete_Service" scriptFormat="python" camunda:resultVariable="ServiceDeleted" camunda:resource="deployment:///tmp/workflows/DeleteService.py">
+      <bpmn:incoming>SequenceFlow_0skk5gs</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0kqoorr</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="SequenceFlow_0skk5gs" sourceRef="StartEvent_DeleteServic" targetRef="ScriptTask_DeleteService" />
+    <bpmn:endEvent id="EndEvent_DeleteService" name="End_Delete_Service">
+      <bpmn:incoming>SequenceFlow_0kqoorr</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0kqoorr" sourceRef="ScriptTask_DeleteService" targetRef="EndEvent_DeleteService" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="DeleteService">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_DeleteServic">
+        <dc:Bounds x="162" y="82" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="148" y="125" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ScriptTask_01arat8_di" bpmnElement="ScriptTask_DeleteService">
+        <dc:Bounds x="270" y="60" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0skk5gs_di" bpmnElement="SequenceFlow_0skk5gs">
+        <di:waypoint x="198" y="100" />
+        <di:waypoint x="270" y="100" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_1vzizli_di" bpmnElement="EndEvent_DeleteService">
+        <dc:Bounds x="482" y="82" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="459" y="125" width="87" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0kqoorr_di" bpmnElement="SequenceFlow_0kqoorr">
+        <di:waypoint x="370" y="100" />
+        <di:waypoint x="482" y="100" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

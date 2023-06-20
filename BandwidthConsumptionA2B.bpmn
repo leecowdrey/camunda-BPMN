@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_0wskfyo" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.3.2">
+  <bpmn:process id="FindSpectrumDetailsForRoadmLine" name="FindSpectrumDetailsForRoadmLine&#10;" isExecutable="true" camunda:versionTag="0.1">
+    <bpmn:startEvent id="StartEvent_FindBandwidthConsumed" name="Find_Bandwidth_Consumed">
+      <bpmn:outgoing>SequenceFlow_0icy8yp</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:scriptTask id="ScriptTask_ValidateRoadmSpectrumInputs" name="Validate_Roadm_Spectrum_Inputs" scriptFormat="python" camunda:resultVariable="RoadmSpectrumInputsValid" camunda:resource="deployment:///tmp/workflows/ValidateRoadmSpectrumInputs.py">
+      <bpmn:incoming>SequenceFlow_0icy8yp</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_006we84</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="SequenceFlow_0icy8yp" sourceRef="StartEvent_FindBandwidthConsumed" targetRef="ScriptTask_ValidateRoadmSpectrumInputs" />
+    <bpmn:scriptTask id="ScriptTask_FindAndTranslateInfoForRoadmSpectrum" name="Find_And_Translate_Info_For_Roadm_Spectrum" scriptFormat="python" camunda:resultVariable="CompleteInfoForRoadmSpectrum" camunda:resource="deployment:///tmp/workflows/FindAndTranslateInfoForRoadmSpectrum.py">
+      <bpmn:incoming>SequenceFlow_020dgd5</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_006j9ts</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="SequenceFlow_006we84" sourceRef="ScriptTask_ValidateRoadmSpectrumInputs" targetRef="ExclusiveGateway_ValidateStage" />
+    <bpmn:sequenceFlow id="SequenceFlow_006j9ts" sourceRef="ScriptTask_FindAndTranslateInfoForRoadmSpectrum" targetRef="ExclusiveGateway_1fzyll3" />
+    <bpmn:scriptTask id="ScriptTask_ComputeBandwidthRoadm" name="Compute_Bandwidth_For_Roadm" scriptFormat="python" camunda:resultVariable="BandwidthComputationSuccessful" camunda:resource="deployment:///tmp/workflows/ComputeBandwidthForRoadmSpectrum.py">
+      <bpmn:incoming>SequenceFlow_0mdypaz</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1y2gfov</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:scriptTask id="ScriptTask_RespondWithTapiRoadmSpectrum" name="Respond_With_Tapi_Roadm_Spectrum" scriptFormat="python" camunda:resultVariable="TapiRoadmSpectrumData" camunda:resource="deployment:///tmp/workflows/RespondWithTapiRoadmSpectrum.py">
+      <bpmn:incoming>SequenceFlow_1hq54r3</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_004e0ca</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:endEvent id="EndEvent_EndFindBandwidth" name="End_Find_Bandwidth_Consumption">
+      <bpmn:incoming>SequenceFlow_004e0ca</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_130lig4</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_03y9ubu</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_0u2y5q6</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_004e0ca" sourceRef="ScriptTask_RespondWithTapiRoadmSpectrum" targetRef="EndEvent_EndFindBandwidth" />
+    <bpmn:exclusiveGateway id="ExclusiveGateway_ValidateStage" name="Input valid?">
+      <bpmn:incoming>SequenceFlow_006we84</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_020dgd5</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_130lig4</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_020dgd5" name="yes" sourceRef="ExclusiveGateway_ValidateStage" targetRef="ScriptTask_FindAndTranslateInfoForRoadmSpectrum">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${RoadmSpectrumInputsValid == 1}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_130lig4" name="no" sourceRef="ExclusiveGateway_ValidateStage" targetRef="EndEvent_EndFindBandwidth">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${RoadmSpectrumInputsValid == 0}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_1fzyll3" name="Roadmline info found?">
+      <bpmn:incoming>SequenceFlow_006j9ts</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_03y9ubu</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_0mdypaz</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_03y9ubu" name="no" sourceRef="ExclusiveGateway_1fzyll3" targetRef="EndEvent_EndFindBandwidth">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${CompleteInfoForRoadmSpectrum == 0}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_1ou7k5i" name="Computation Successful?">
+      <bpmn:incoming>SequenceFlow_1y2gfov</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1hq54r3</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_0u2y5q6</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_1y2gfov" sourceRef="ScriptTask_ComputeBandwidthRoadm" targetRef="ExclusiveGateway_1ou7k5i" />
+    <bpmn:sequenceFlow id="SequenceFlow_1hq54r3" name="yes" sourceRef="ExclusiveGateway_1ou7k5i" targetRef="ScriptTask_RespondWithTapiRoadmSpectrum">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${BandwidthComputationSuccessful == 1}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_0mdypaz" name="yes" sourceRef="ExclusiveGateway_1fzyll3" targetRef="ScriptTask_ComputeBandwidthRoadm">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${CompleteInfoForRoadmSpectrum == 1}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_0u2y5q6" name="no" sourceRef="ExclusiveGateway_1ou7k5i" targetRef="EndEvent_EndFindBandwidth">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${BandwidthComputationSuccessful == 0}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="FindSpectrumDetailsForRoadmLine">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_FindBandwidthConsumed">
+        <dc:Bounds x="182" y="192" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="160" y="237.5" width="79" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ScriptTask_00cpoyk_di" bpmnElement="ScriptTask_ValidateRoadmSpectrumInputs">
+        <dc:Bounds x="280" y="180" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0icy8yp_di" bpmnElement="SequenceFlow_0icy8yp">
+        <di:waypoint x="218" y="210" />
+        <di:waypoint x="280" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ScriptTask_00zh85q_di" bpmnElement="ScriptTask_FindAndTranslateInfoForRoadmSpectrum">
+        <dc:Bounds x="460" y="180" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_006we84_di" bpmnElement="SequenceFlow_006we84">
+        <di:waypoint x="360" y="180" />
+        <di:waypoint x="360" y="150" />
+        <di:waypoint x="395" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_006j9ts_di" bpmnElement="SequenceFlow_006j9ts">
+        <di:waypoint x="550" y="180" />
+        <di:waypoint x="550" y="150" />
+        <di:waypoint x="585" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ScriptTask_0w2unga_di" bpmnElement="ScriptTask_ComputeBandwidthRoadm">
+        <dc:Bounds x="660" y="180" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ScriptTask_1mp1asn_di" bpmnElement="ScriptTask_RespondWithTapiRoadmSpectrum">
+        <dc:Bounds x="850" y="180" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_18wg2vv_di" bpmnElement="EndEvent_EndFindBandwidth">
+        <dc:Bounds x="1062" y="202" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1035" y="164.5" width="89" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_004e0ca_di" bpmnElement="SequenceFlow_004e0ca">
+        <di:waypoint x="950" y="220" />
+        <di:waypoint x="1062" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0kyvr7c_di" bpmnElement="ExclusiveGateway_ValidateStage" isMarkerVisible="true">
+        <dc:Bounds x="395" y="125" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="395" y="95" width="57" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_020dgd5_di" bpmnElement="SequenceFlow_020dgd5">
+        <di:waypoint x="445" y="150" />
+        <di:waypoint x="470" y="150" />
+        <di:waypoint x="470" y="180" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="461" y="133" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_130lig4_di" bpmnElement="SequenceFlow_130lig4">
+        <di:waypoint x="420" y="175" />
+        <di:waypoint x="420" y="360" />
+        <di:waypoint x="1080" y="360" />
+        <di:waypoint x="1080" y="238" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="423" y="334" width="13" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_1fzyll3_di" bpmnElement="ExclusiveGateway_1fzyll3" isMarkerVisible="true">
+        <dc:Bounds x="585" y="125" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="576" y="95" width="74" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_03y9ubu_di" bpmnElement="SequenceFlow_03y9ubu">
+        <di:waypoint x="610" y="175" />
+        <di:waypoint x="610" y="360" />
+        <di:waypoint x="1080" y="360" />
+        <di:waypoint x="1080" y="238" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="613" y="333" width="13" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_1ou7k5i_di" bpmnElement="ExclusiveGateway_1ou7k5i" isMarkerVisible="true">
+        <dc:Bounds x="785" y="125" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="779" y="95" width="63" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1y2gfov_di" bpmnElement="SequenceFlow_1y2gfov">
+        <di:waypoint x="750" y="180" />
+        <di:waypoint x="750" y="150" />
+        <di:waypoint x="785" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1hq54r3_di" bpmnElement="SequenceFlow_1hq54r3">
+        <di:waypoint x="835" y="150" />
+        <di:waypoint x="870" y="150" />
+        <di:waypoint x="870" y="180" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="861" y="133" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0mdypaz_di" bpmnElement="SequenceFlow_0mdypaz">
+        <di:waypoint x="635" y="150" />
+        <di:waypoint x="670" y="150" />
+        <di:waypoint x="670" y="180" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="661" y="133" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0u2y5q6_di" bpmnElement="SequenceFlow_0u2y5q6">
+        <di:waypoint x="810" y="175" />
+        <di:waypoint x="810" y="360" />
+        <di:waypoint x="1080" y="360" />
+        <di:waypoint x="1080" y="238" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="813" y="333" width="13" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

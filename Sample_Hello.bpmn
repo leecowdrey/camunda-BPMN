@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" id="Definitions_1ru3y61" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="2.2.4">
+  <bpmn:process id="Sample" name="Sample" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>SequenceFlow_0sjo5bk</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:scriptTask id="Greet" name="Greet" scriptFormat="python">
+      <bpmn:incoming>SequenceFlow_0sjo5bk</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1tdznfl</bpmn:outgoing>
+      <bpmn:script>greet = "Welcome User"
+execution.getProcessInstance().setVariable(execution.getProcessInstanceId(), greet);
+</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:endEvent id="EndEvent_1r862oz">
+      <bpmn:incoming>SequenceFlow_1tdznfl</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0sjo5bk" sourceRef="StartEvent_1" targetRef="Greet" />
+    <bpmn:sequenceFlow id="SequenceFlow_1tdznfl" sourceRef="Greet" targetRef="EndEvent_1r862oz" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Sample">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="198" y="320" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ScriptTask_1oxmyhk_di" bpmnElement="Greet">
+        <dc:Bounds x="301" y="298" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1r862oz_di" bpmnElement="EndEvent_1r862oz">
+        <dc:Bounds x="498" y="320" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0sjo5bk_di" bpmnElement="SequenceFlow_0sjo5bk">
+        <di:waypoint x="234" y="338" />
+        <di:waypoint x="301" y="338" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1tdznfl_di" bpmnElement="SequenceFlow_1tdznfl">
+        <di:waypoint x="401" y="338" />
+        <di:waypoint x="498" y="338" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

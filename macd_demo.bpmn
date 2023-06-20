@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_0jo54vb" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.1.2">
+  <bpmn:process id="macdDemoWorkFlow" name="macdDemoWorkFlow" isExecutable="true" camunda:versionTag="1.0">
+    <bpmn:startEvent id="StartEvent_1" name="Start8">
+      <bpmn:outgoing>SequenceFlow_18ig4mh</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_18ig4mh" sourceRef="StartEvent_1" targetRef="Precheck_Task_0323ecw" />
+    <bpmn:exclusiveGateway id="ExclusiveGateway_179axv8" name="precheckSuccess?">
+      <bpmn:incoming>SequenceFlow_1a0arun</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_17c4ynf</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_1upke6n</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_1a0arun" sourceRef="Precheck_Task_0323ecw" targetRef="ExclusiveGateway_179axv8" />
+    <bpmn:sequenceFlow id="SequenceFlow_17c4ynf" name="PrecheckSuccess" sourceRef="ExclusiveGateway_179axv8" targetRef="UpdateDevice_Task_1nwm4i8">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{precheckSuccess}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:endEvent id="EndEvent_1gkp3zv" name="End">
+      <bpmn:incoming>SequenceFlow_1upke6n</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_1yz20oc</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_1upke6n" name="PrecheckFail" sourceRef="ExclusiveGateway_179axv8" targetRef="EndEvent_1gkp3zv">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{not precheckSuccess}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:scriptTask id="UpdateDevice_Task_1nwm4i8" name="Update Device" scriptFormat="python" camunda:resource="deployment:///tmp/workflows/macd_update.py">
+      <bpmn:incoming>SequenceFlow_17c4ynf</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0w5h1jq</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="SequenceFlow_0w5h1jq" sourceRef="UpdateDevice_Task_1nwm4i8" targetRef="Postcheck_Task_11exn59" />
+    <bpmn:scriptTask id="Precheck_Task_0323ecw" name="Precheck" scriptFormat="python" camunda:resource="deployment:///tmp/workflows/macd_precheck.py">
+      <bpmn:incoming>SequenceFlow_18ig4mh</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1a0arun</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="SequenceFlow_1yz20oc" sourceRef="Postcheck_Task_11exn59" targetRef="EndEvent_1gkp3zv" />
+    <bpmn:scriptTask id="Postcheck_Task_11exn59" name="PostCheck" scriptFormat="python" camunda:resource="deployment:///tmp/workflows/macd_postcheck.py">
+      <bpmn:incoming>SequenceFlow_0w5h1jq</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1yz20oc</bpmn:outgoing>
+    </bpmn:scriptTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="macdDemoWorkFlow">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="117" y="103" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="120" y="146" width="30" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_18ig4mh_di" bpmnElement="SequenceFlow_18ig4mh">
+        <di:waypoint x="153" y="121" />
+        <di:waypoint x="229" y="121" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_179axv8_di" bpmnElement="ExclusiveGateway_179axv8" isMarkerVisible="true">
+        <dc:Bounds x="426" y="96" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="408" y="66" width="87" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1a0arun_di" bpmnElement="SequenceFlow_1a0arun">
+        <di:waypoint x="329" y="121" />
+        <di:waypoint x="426" y="121" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_17c4ynf_di" bpmnElement="SequenceFlow_17c4ynf">
+        <di:waypoint x="476" y="121" />
+        <di:waypoint x="627" y="121" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="508" y="103" width="88" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_1gkp3zv_di" bpmnElement="EndEvent_1gkp3zv">
+        <dc:Bounds x="518" y="268" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="526" y="311" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1upke6n_di" bpmnElement="SequenceFlow_1upke6n">
+        <di:waypoint x="451" y="146" />
+        <di:waypoint x="451" y="286" />
+        <di:waypoint x="518" y="286" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="435" y="211" width="64" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ScriptTask_1114ckc_di" bpmnElement="UpdateDevice_Task_1nwm4i8">
+        <dc:Bounds x="627" y="81" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0w5h1jq_di" bpmnElement="SequenceFlow_0w5h1jq">
+        <di:waypoint x="677" y="161" />
+        <di:waypoint x="677" y="246" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ScriptTask_11nwgmn_di" bpmnElement="Precheck_Task_0323ecw">
+        <dc:Bounds x="229" y="81" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1yz20oc_di" bpmnElement="SequenceFlow_1yz20oc">
+        <di:waypoint x="627" y="286" />
+        <di:waypoint x="554" y="286" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ScriptTask_0lsjsu4_di" bpmnElement="Postcheck_Task_11exn59">
+        <dc:Bounds x="627" y="246" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

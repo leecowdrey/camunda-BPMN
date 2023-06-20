@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1ph0f82" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.6.0">
+  <bpmn:process id="CanPlanPhotonicService" name="CanPlanPhotonicService" isExecutable="true" camunda:versionTag="0.1">
+    <bpmn:startEvent id="StartEvent_CanPlanPhotonicService" name="CanPlanPhotonicService">
+      <bpmn:outgoing>SequenceFlow_0skk5gs</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:scriptTask id="ScriptTask_ValidatePlanPhotonicInputs" name="Validate_Plan_Photonic_Inputs" scriptFormat="python" camunda:resultVariable="PlanPhotonicInputsValid" camunda:resource="deployment:///tmp/workflows/ValidatePlanPhotonicInputs.py">
+      <bpmn:incoming>SequenceFlow_0skk5gs</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1btrelh</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="SequenceFlow_0skk5gs" sourceRef="StartEvent_CanPlanPhotonicService" targetRef="ScriptTask_ValidatePlanPhotonicInputs" />
+    <bpmn:sequenceFlow id="SequenceFlow_1btrelh" sourceRef="ScriptTask_ValidatePlanPhotonicInputs" targetRef="ExclusiveGateway_1i9rp6n" />
+    <bpmn:scriptTask id="Task_FindAndTranslateInfoForPlanPhotonic" name="Find_And_Translate_Info_For_Plan_Photonic" scriptFormat="python" camunda:resultVariable="CompleteInfoForPlanPhotonicService" camunda:resource="deployment:///tmp/workflows/FindAndTranslateInfoForPlanPhotonic.py">
+      <bpmn:incoming>SequenceFlow_0zg6mz1</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0g53pnm</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="SequenceFlow_0g53pnm" sourceRef="Task_FindAndTranslateInfoForPlanPhotonic" targetRef="ExclusiveGateway_091gmm9" />
+    <bpmn:scriptTask id="Task_SelectPlanForPhotonic" name="Select_Plan_For_Photonic" scriptFormat="python" camunda:resultVariable="FinalPathForPlanPhotonicService" camunda:resource="deployment:///tmp/workflows/SelectPlanForPhotonic.py">
+      <bpmn:incoming>SequenceFlow_1j7lyhg</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0stlq4b</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="SequenceFlow_0stlq4b" sourceRef="Task_SelectPlanForPhotonic" targetRef="ExclusiveGateway_1twk1bl" />
+    <bpmn:scriptTask id="Task_WaitForPlanPhotonic" name="Wait_For_Plan_Photonic_Status" scriptFormat="python" camunda:resultVariable="ExecStatusOfPlanPhotonic" camunda:resource="deployment:///tmp/workflows/PlanPhotonicStatus.py">
+      <bpmn:incoming>SequenceFlow_0mckau9</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1iv5b6f</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:endEvent id="EndEvent_EndPlanPhotonic" name="End_Plan_Photonic">
+      <bpmn:incoming>SequenceFlow_0ua3nhs</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_0se24ng</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_1x2qufv</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_0ozxyax</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_1a5ujkk</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_1iv5b6f" sourceRef="Task_WaitForPlanPhotonic" targetRef="ExclusiveGateway_1a4blil" />
+    <bpmn:scriptTask id="ScriptTask_RespondWithTapiPlanPhotonic" name="Respond_With_Tapi_Plan_Photonic" scriptFormat="python" camunda:resultVariable="TapiPlanPhotonicService" camunda:resource="deployment:///tmp/workflows/RespondWithTapiPlanPhotonic.py">
+      <bpmn:incoming>SequenceFlow_0c6bccx</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0ua3nhs</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="SequenceFlow_0ua3nhs" sourceRef="ScriptTask_RespondWithTapiPlanPhotonic" targetRef="EndEvent_EndPlanPhotonic" />
+    <bpmn:exclusiveGateway id="ExclusiveGateway_1i9rp6n" name="valid inputs?">
+      <bpmn:incoming>SequenceFlow_1btrelh</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0zg6mz1</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_1a5ujkk</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_0zg6mz1" name="yes" sourceRef="ExclusiveGateway_1i9rp6n" targetRef="Task_FindAndTranslateInfoForPlanPhotonic">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${PlanPhotonicInputsValid == 1}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_091gmm9" name="translated?">
+      <bpmn:incoming>SequenceFlow_0g53pnm</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1j7lyhg</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_0ozxyax</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_1j7lyhg" name="yes" sourceRef="ExclusiveGateway_091gmm9" targetRef="Task_SelectPlanForPhotonic">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${CompleteInfoForPlanPhotonicService == 1}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_1twk1bl" name="plan selected?">
+      <bpmn:incoming>SequenceFlow_0stlq4b</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0mckau9</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_1x2qufv</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_0mckau9" name="yes" sourceRef="ExclusiveGateway_1twk1bl" targetRef="Task_WaitForPlanPhotonic">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${FinalPathForPlanPhotonicService == 1}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_1a4blil" name="plan status?">
+      <bpmn:incoming>SequenceFlow_1iv5b6f</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0c6bccx</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_0se24ng</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_0c6bccx" name="yes" sourceRef="ExclusiveGateway_1a4blil" targetRef="ScriptTask_RespondWithTapiPlanPhotonic">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${ExecStatusOfPlanPhotonic == 1}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_0se24ng" name="no" sourceRef="ExclusiveGateway_1a4blil" targetRef="EndEvent_EndPlanPhotonic">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${ExecStatusOfPlanPhotonic == 0}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_1x2qufv" name="no" sourceRef="ExclusiveGateway_1twk1bl" targetRef="EndEvent_EndPlanPhotonic">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${FinalPathForPlanPhotonicService == 0}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_0ozxyax" name="no" sourceRef="ExclusiveGateway_091gmm9" targetRef="EndEvent_EndPlanPhotonic">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${CompleteInfoForPlanPhotonicService == 0}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_1a5ujkk" name="no" sourceRef="ExclusiveGateway_1i9rp6n" targetRef="EndEvent_EndPlanPhotonic">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${PlanPhotonicInputsValid == 0}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="CanPlanPhotonicService">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_CanPlanPhotonicService">
+        <dc:Bounds x="162" y="222" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="139" y="265" width="86" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ScriptTask_01arat8_di" bpmnElement="ScriptTask_ValidatePlanPhotonicInputs">
+        <dc:Bounds x="270" y="200" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0skk5gs_di" bpmnElement="SequenceFlow_0skk5gs">
+        <di:waypoint x="198" y="240" />
+        <di:waypoint x="270" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1btrelh_di" bpmnElement="SequenceFlow_1btrelh">
+        <di:waypoint x="340" y="200" />
+        <di:waypoint x="340" y="140" />
+        <di:waypoint x="395" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ScriptTask_12b0zml_di" bpmnElement="Task_FindAndTranslateInfoForPlanPhotonic">
+        <dc:Bounds x="460" y="200" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0g53pnm_di" bpmnElement="SequenceFlow_0g53pnm">
+        <di:waypoint x="540" y="200" />
+        <di:waypoint x="540" y="140" />
+        <di:waypoint x="585" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ScriptTask_0gb7m9k_di" bpmnElement="Task_SelectPlanForPhotonic">
+        <dc:Bounds x="650" y="200" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0stlq4b_di" bpmnElement="SequenceFlow_0stlq4b">
+        <di:waypoint x="730" y="200" />
+        <di:waypoint x="730" y="140" />
+        <di:waypoint x="775" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ScriptTask_0jzs5cq_di" bpmnElement="Task_WaitForPlanPhotonic">
+        <dc:Bounds x="840" y="200" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1vzizli_di" bpmnElement="EndEvent_EndPlanPhotonic">
+        <dc:Bounds x="1252" y="222" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1225" y="184.5" width="89" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1iv5b6f_di" bpmnElement="SequenceFlow_1iv5b6f">
+        <di:waypoint x="910" y="200" />
+        <di:waypoint x="910" y="140" />
+        <di:waypoint x="955" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ScriptTask_1sddqwe_di" bpmnElement="ScriptTask_RespondWithTapiPlanPhotonic">
+        <dc:Bounds x="1030" y="200" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0ua3nhs_di" bpmnElement="SequenceFlow_0ua3nhs">
+        <di:waypoint x="1130" y="240" />
+        <di:waypoint x="1252" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_1i9rp6n_di" bpmnElement="ExclusiveGateway_1i9rp6n" isMarkerVisible="true">
+        <dc:Bounds x="395" y="115" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="391" y="85" width="62" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0zg6mz1_di" bpmnElement="SequenceFlow_0zg6mz1">
+        <di:waypoint x="445" y="140" />
+        <di:waypoint x="490" y="140" />
+        <di:waypoint x="490" y="200" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="459" y="122" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_091gmm9_di" bpmnElement="ExclusiveGateway_091gmm9" isMarkerVisible="true">
+        <dc:Bounds x="585" y="115" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="583" y="85" width="55" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1j7lyhg_di" bpmnElement="SequenceFlow_1j7lyhg">
+        <di:waypoint x="635" y="140" />
+        <di:waypoint x="670" y="140" />
+        <di:waypoint x="670" y="200" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="644" y="122" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_1twk1bl_di" bpmnElement="ExclusiveGateway_1twk1bl" isMarkerVisible="true">
+        <dc:Bounds x="775" y="115" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="765" y="85" width="71" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0mckau9_di" bpmnElement="SequenceFlow_0mckau9">
+        <di:waypoint x="825" y="140" />
+        <di:waypoint x="860" y="140" />
+        <di:waypoint x="860" y="200" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="834" y="122" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_1a4blil_di" bpmnElement="ExclusiveGateway_1a4blil" isMarkerVisible="true">
+        <dc:Bounds x="955" y="115" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="950" y="85" width="60" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0c6bccx_di" bpmnElement="SequenceFlow_0c6bccx">
+        <di:waypoint x="1005" y="140" />
+        <di:waypoint x="1050" y="140" />
+        <di:waypoint x="1050" y="200" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1019" y="122" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0se24ng_di" bpmnElement="SequenceFlow_0se24ng">
+        <di:waypoint x="980" y="165" />
+        <di:waypoint x="980" y="360" />
+        <di:waypoint x="1270" y="360" />
+        <di:waypoint x="1270" y="258" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1013" y="342" width="13" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1x2qufv_di" bpmnElement="SequenceFlow_1x2qufv">
+        <di:waypoint x="800" y="165" />
+        <di:waypoint x="800" y="360" />
+        <di:waypoint x="1270" y="360" />
+        <di:waypoint x="1270" y="258" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="823" y="342" width="13" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0ozxyax_di" bpmnElement="SequenceFlow_0ozxyax">
+        <di:waypoint x="610" y="165" />
+        <di:waypoint x="610" y="360" />
+        <di:waypoint x="1270" y="360" />
+        <di:waypoint x="1270" y="258" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="633" y="342" width="13" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1a5ujkk_di" bpmnElement="SequenceFlow_1a5ujkk">
+        <di:waypoint x="420" y="165" />
+        <di:waypoint x="420" y="360" />
+        <di:waypoint x="1270" y="360" />
+        <di:waypoint x="1270" y="258" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="443" y="342" width="13" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

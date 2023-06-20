@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1fmyug6" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.3.2">
+  <bpmn:process id="Process_CreatePhotonicService" name="Find-And-Create-Photonice-Service" isExecutable="true" camunda:versionTag="0.1">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>SequenceFlow_1khtrab</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_1khtrab" sourceRef="StartEvent_1" targetRef="Task_ValidateEndpoints" />
+    <bpmn:scriptTask id="Task_ValidateEndpoints" name="Validate-Endpoints" scriptFormat="python" camunda:resultVariable="EndpointsValid" camunda:resource="deployment:///tmp/workflows/ValidateEndpoints.py">
+      <bpmn:incoming>SequenceFlow_1khtrab</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0zsv04t</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="SequenceFlow_0zsv04t" sourceRef="Task_ValidateEndpoints" targetRef="Task_FindRoute" />
+    <bpmn:scriptTask id="Task_FindRoute" name="Find-Possible-Route" scriptFormat="python" camunda:resultVariable="ListOfRouteBetweenAandB" camunda:resource="deployment:///tmp/workflows/FindPossibleRoute.py">
+      <bpmn:incoming>SequenceFlow_0zsv04t</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1mabrab</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:intermediateThrowEvent id="IntermediateThrowEvent_SeekUserInput" name="Return-Possble-Route-And-Capacity">
+      <bpmn:incoming>SequenceFlow_1mabrab</bpmn:incoming>
+    </bpmn:intermediateThrowEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_1mabrab" sourceRef="Task_FindRoute" targetRef="IntermediateThrowEvent_SeekUserInput" />
+    <bpmn:intermediateThrowEvent id="IntermediateThrowEvent_UserSelectedRoute" name="User-Selected-Route">
+      <bpmn:outgoing>SequenceFlow_1gp83q8</bpmn:outgoing>
+    </bpmn:intermediateThrowEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_1gp83q8" sourceRef="IntermediateThrowEvent_UserSelectedRoute" targetRef="Task_CreateRoute" />
+    <bpmn:sequenceFlow id="SequenceFlow_1rip6wj" sourceRef="Task_CreateRoute" targetRef="Task_WaitForPhotonic" />
+    <bpmn:sequenceFlow id="SequenceFlow_CheckStatusPhotonic" name="Check-Status-Of-Photonic-Service" sourceRef="Task_WaitForPhotonic" targetRef="Task_WaitForPhotonic" />
+    <bpmn:endEvent id="EndEvent_PhotonicService" name="Create-Photonic-Service-Results">
+      <bpmn:incoming>SequenceFlow_0m4gnec</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0m4gnec" sourceRef="Task_WaitForPhotonic" targetRef="EndEvent_PhotonicService" />
+    <bpmn:scriptTask id="Task_CreateRoute" name="Create-Photonic-For-User-Selected-Route" scriptFormat="python" camunda:resultVariable="JobIdPhotonicService" camunda:resource="deployment:///tmp/workflows/SendRequestCreatePhotonic.py">
+      <bpmn:incoming>SequenceFlow_1gp83q8</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1rip6wj</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:scriptTask id="Task_WaitForPhotonic" name="Wait-For-Status-Photonic-Service" scriptFormat="python" camunda:resultVariable="CurrentStatusCreatePhotonic" camunda:resource="deployment:///tmp/workflows/PollForStatus.py">
+      <bpmn:incoming>SequenceFlow_1rip6wj</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_CheckStatusPhotonic</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_CheckStatusPhotonic</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_0m4gnec</bpmn:outgoing>
+    </bpmn:scriptTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_CreatePhotonicService">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1khtrab_di" bpmnElement="SequenceFlow_1khtrab">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="270" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ScriptTask_17tsxyc_di" bpmnElement="Task_ValidateEndpoints">
+        <dc:Bounds x="270" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0zsv04t_di" bpmnElement="SequenceFlow_0zsv04t">
+        <di:waypoint x="370" y="117" />
+        <di:waypoint x="430" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ScriptTask_0da1csc_di" bpmnElement="Task_FindRoute">
+        <dc:Bounds x="430" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="IntermediateThrowEvent_1d95fht_di" bpmnElement="IntermediateThrowEvent_SeekUserInput">
+        <dc:Bounds x="592" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="572" y="142" width="80" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1mabrab_di" bpmnElement="SequenceFlow_1mabrab">
+        <di:waypoint x="530" y="117" />
+        <di:waypoint x="592" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="IntermediateThrowEvent_0isrhvf_di" bpmnElement="IntermediateThrowEvent_UserSelectedRoute">
+        <dc:Bounds x="179" y="282" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="161" y="325" width="74" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1gp83q8_di" bpmnElement="SequenceFlow_1gp83q8">
+        <di:waypoint x="215" y="300" />
+        <di:waypoint x="270" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1rip6wj_di" bpmnElement="SequenceFlow_1rip6wj">
+        <di:waypoint x="370" y="300" />
+        <di:waypoint x="430" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1b3o4r8_di" bpmnElement="SequenceFlow_CheckStatusPhotonic">
+        <di:waypoint x="480" y="340" />
+        <di:waypoint x="480" y="360" />
+        <di:waypoint x="410" y="360" />
+        <di:waypoint x="410" y="320" />
+        <di:waypoint x="430" y="320" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="403" y="366" width="86" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_0uvriai_di" bpmnElement="EndEvent_PhotonicService">
+        <dc:Bounds x="592" y="282" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="574" y="325" width="84" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0m4gnec_di" bpmnElement="SequenceFlow_0m4gnec">
+        <di:waypoint x="530" y="300" />
+        <di:waypoint x="592" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ScriptTask_0bpiy0p_di" bpmnElement="Task_CreateRoute">
+        <dc:Bounds x="270" y="260" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ScriptTask_0spru5q_di" bpmnElement="Task_WaitForPhotonic">
+        <dc:Bounds x="430" y="260" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
